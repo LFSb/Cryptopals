@@ -32,7 +32,7 @@ namespace ConsoleApplication
 
     public static void Main(string[] args)
     {
-      if(String.Equals(Converter.ConvertHexToBase64(HexToConvert), HexConvertTarget))
+      if(String.Equals(HexToConvert, HexConvertTarget))
       {
         System.Console.WriteLine("Converting hex to base64 successful!");
       }
@@ -42,7 +42,7 @@ namespace ConsoleApplication
         return;
       }
 
-      var output = XOR.XOREqualLengthInputs(Converter.ConvertHexToBase64(Xor1), Converter.ConvertHexToBase64(Xor2));
+      var output = XOR.XOREqualLengthInputs(Xor1, Xor2);
 
       if(String.Equals(output, ExpectedXor))
       {
@@ -76,7 +76,7 @@ namespace ConsoleApplication
         {
           System.Console.WriteLine("XOR'ing using key {0}", idx);
 
-          var xorOutput = XOR.XOREqualLengthInputs(Converter.ConvertHexToBase64(xord), Converter.ConvertHexToBase64(new String(idx , xord.Length)));
+          var xorOutput = XOR.XOREqualLengthInputs(xord,new String(idx , xord.Length));
 
           foreach(var character in xorOutput)
           {
