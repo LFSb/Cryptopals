@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Collections.Generic;
 using ConsoleApplication.Helpers;
 
 namespace ConsoleApplication
@@ -22,6 +24,12 @@ namespace ConsoleApplication
 
     #endregion
 
+    #region Challenge 3: Single-byte XOR Cipher
+
+    private const string xord = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
+
+    #endregion
+
     public static void Main(string[] args)
     {
       if(String.Equals(Converter.ConvertHexToBase64(HexToConvert), HexConvertTarget))
@@ -34,7 +42,7 @@ namespace ConsoleApplication
         return;
       }
 
-      var output = XOR.XORInputs(Xor1, Xor2);
+      var output = XOR.XOREqualLengthInputs(Converter.ConvertHexToBase64(Xor1), Converter.ConvertHexToBase64(Xor2));
 
       if(String.Equals(output, ExpectedXor))
       {
@@ -43,6 +51,47 @@ namespace ConsoleApplication
       else
       {
         System.Console.WriteLine("XOR failed! Output: {0}", output);
+      }
+
+      var keyFrequencies = new Dictionary<char, Dictionary<char,int>>();
+
+      for(var idx = char.MinValue; idx < char.MaxValue; idx++)
+      {
+        var frequency = new Dictionary<char,int>{
+                {'e',0},
+                {'t',0},
+                {'a',0},
+                {'o',0},
+                {'i',0},
+                {'n',0},
+                {'s',0},
+                {'h',0},
+                {'r',0},
+                {'d',0},
+                {'l',0},
+                {'u',0}
+              };
+
+        if(char.IsLetterOrDigit(idx) && idx.IsHex())
+        {
+          System.Console.WriteLine("XOR'ing using key {0}", idx);
+
+          var xorOutput = XOR.XOREqualLengthInputs(Converter.ConvertHexToBase64(xord), Converter.ConvertHexToBase64(new String(idx , xord.Length)));
+
+          foreach(var character in xorOutput)
+          {
+            if(frequency.ContainsKey(character))
+            {
+              frequency[character]++;
+            }
+          }
+
+          keyFrequencies.Add(idx, frequency);
+
+          System.Console.WriteLine(xorOutput);
+
+          System.Console.WriteLine("Frequency was: {0}", String.Join(",", frequency.Select(x => x)));
+        }     
       }
     }
   }

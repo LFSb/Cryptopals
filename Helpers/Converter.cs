@@ -11,5 +11,12 @@ namespace ConsoleApplication.Helpers
 
             return System.Convert.ToBase64String(bytes);
         }
+
+        public static String ConvertBase64ToHex(String base64)
+        {
+          var bytes = Convert.FromBase64String(base64);
+
+          return BitConverter.ToString(bytes).Replace("-", string.Empty);
+        }
     }
 }
