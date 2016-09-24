@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
-using System.Linq;
 
 namespace ConsoleApplication.Helpers
 {
@@ -9,6 +7,7 @@ namespace ConsoleApplication.Helpers
   {
     private const string etaoinshrdlu = "etaoinshrdlumwfgypbvkjxqz";
 
+    //Score the input string based on the occurrance of the most frequently occurring letters in the english language.
     public static Int32 ScoreFrequencies(string input)
     {
       var score = 0;
@@ -35,6 +34,7 @@ namespace ConsoleApplication.Helpers
       return score;
     }
 
+    //Calculate the Hamming Distance, bitwise.
     public static Int32 CalculateHammingDistance(byte[] input1, byte[] input2)
     {
       var score = 0;
@@ -51,7 +51,7 @@ namespace ConsoleApplication.Helpers
         while(val != 0)
         {
           score++;
-          val &= val -1;
+          val &= val - 1;
         }
       }
 

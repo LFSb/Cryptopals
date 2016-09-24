@@ -64,19 +64,20 @@ namespace ConsoleApplication
     {
       if(Initialize())
       {
+        var text = Convert.FromBase64String(File.ReadAllText("TestFiles/6.txt"));
+
         //This is the real challenging part.
         for(byte keySize = 2; keySize <= 40; keySize++)
         {
-          //var hammingDistance = Frequency.CalculateHammingDistance()
-        }
-        
+          
+        }        
       }
     }
 
     public static bool Initialize()
     {
       //#1 https://cryptopals.com/sets/1/challenges/1
-      if(String.Equals(Converter.ConvertHexToBase64(HexToConvert), HexConvertTarget))
+      if(string.Equals(Converter.ConvertHexToBase64(HexToConvert), HexConvertTarget))
       {
         System.Console.WriteLine("TEST: EX1: Converting hex to base64 successful!");
       }
