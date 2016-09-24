@@ -12,38 +12,21 @@ namespace ConsoleApplication.Helpers
 
       foreach(var character in input)
       {
-        if((byte)character < 0x65)
+        if(char.IsLetter(character))
+        {
+          if(etaoinshrdlu.Contains(character.ToString()))
+          {
+            score += etaoinshrdlu.Length - etaoinshrdlu.IndexOf(character);
+          }
+          else
+          {
+            score++;
+          }
+        }
+        else
         {
           score--;
-        }
-        switch(character)
-        {
-          case 'e':
-          {
-            score += 5;
-            break;
-          }
-          case 't':
-          {
-            score += 5;
-            break;
-          }
-          case 'a':
-          {
-            score += 4;
-            break;
-          }
-          case 'o':
-          {
-            score += 4;
-            break;
-          }
-          case 'i':
-          {
-            score += 4;
-            break;
-          }
-        }     
+        }    
       }
 
       return score;
