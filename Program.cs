@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Diagnostics;
 using System.Collections.Generic;
 using ConsoleApplication.Helpers;
 
@@ -39,38 +40,63 @@ namespace ConsoleApplication
 
     #endregion
 
+    #region Challenge 5: Repeating key XOR
+
+    private const string ex5Input = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
+
+    private const string ex5Key = "ICE";
+
+    private const string ex5ExpectedOutput = "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f";
+
+    #endregion
+
+    #region Challenge 6: The real shit
+
+    private const string hammingDistanceInput1 = "this is a test";
+
+    private const string hammingDistanceInput2 = "wokka wokka!!!";
+
+    private const Int32 hammingDistanceCheck = 37;
+
+    #endregion
+
     public static void Main(string[] args)
     {
       if(Initialize())
       {
+        //This is the real challenging part.
+        for(var keySize = 2; keySize <= 40; keySize++)
+        {
+          
+
+        }
         
       }
     }
 
     public static bool Initialize()
     {
-
       //#1 https://cryptopals.com/sets/1/challenges/1
       if(String.Equals(Converter.ConvertHexToBase64(HexToConvert), HexConvertTarget))
       {
-        System.Console.WriteLine("TEST: Converting hex to base64 successful!");
+        System.Console.WriteLine("TEST: EX1: Converting hex to base64 successful!");
       }
       else
       {
-        System.Console.WriteLine("TEST: Converting hex to base64 failed! Exiting...");
+        System.Console.WriteLine("TEST: EX1: Converting hex to base64 failed! Exiting...");
         return false;
       }
 
       //#2 https://cryptopals.com/sets/1/challenges/2
-      var output = XOR.XOREqualLengthInputs(Xor1, Xor2);
+      var output = XOR.XOREqualLengthInputs(Convert.FromBase64String(Converter.ConvertHexToBase64(Xor1)), Convert.FromBase64String(Converter.ConvertHexToBase64(Xor2)));
 
       if(String.Equals(output, ExpectedXor))
       {
-        System.Console.WriteLine("TEST: XOR Successful!");
+        System.Console.WriteLine("TEST: EX2: XOR Successful!");
       }
       else
       {
-        System.Console.WriteLine("TEST: XOR failed! Output: {0}", output);
+        System.Console.WriteLine("TEST: EX2: XOR failed! Output: {0}", output);
         return false;
       }
 
@@ -81,7 +107,7 @@ namespace ConsoleApplication
 
       for(var idx = byte.MinValue; idx < byte.MaxValue; idx++)
       {
-        var xorOutput = XOR.XORInputToByte(xord, idx, false);
+        var xorOutput = XOR.XORInputToByte(Convert.FromBase64String(Converter.ConvertHexToBase64(xord)), idx, false);
 
         keyOutput.Add(idx, xorOutput);
 
@@ -94,11 +120,11 @@ namespace ConsoleApplication
 
       if(String.Equals(topOutput,ex3ExpectedAnswer))
       {
-        System.Console.WriteLine("TEST: Single byte XOR successful!");
+        System.Console.WriteLine("TEST: EX3: Single byte XOR successful!");
       }
       else
       {
-        System.Console.WriteLine("TEST: Single byte XOR unsuccesful, output was {0}", topOutput);
+        System.Console.WriteLine("TEST: EX3: Single byte XOR unsuccesful, output was {0}", topOutput);
       }
 
       //#4 https://cryptopals.com/sets/1/challenges/4
@@ -117,7 +143,7 @@ namespace ConsoleApplication
 
         for(var idx = byte.MinValue; idx < byte.MaxValue; idx++)
         {
-          var xorOutput = XOR.XORInputToByte(line, idx, false);
+          var xorOutput = XOR.XORInputToByte(Convert.FromBase64String(Converter.ConvertHexToBase64(line)), idx, false);
 
           byteOutput.Add(idx, xorOutput);
 
@@ -135,11 +161,35 @@ namespace ConsoleApplication
       
       if(String.Equals(highestScoringLine.Value.Value, ex4ExpectedAnswer))
       {
-        System.Console.WriteLine("TEST: Detect single character XOR successful!");
+        System.Console.WriteLine("TEST: EX4: Detect single character XOR successful!");
       }
       else
       {
-        System.Console.WriteLine("TEST: Detect single character XOR not successful, output was: {0}", highestScoringLine.Value.Value);
+        System.Console.WriteLine("TEST: EX4: Detect single character XOR not successful, output was: {0}", highestScoringLine.Value.Value);
+        return false;
+      }
+
+      var ex5Output = XOR.RepeatingKeyXOREncryption(ex5Input, ex5Key);
+
+      if(string.Equals(ex5Output, ex5ExpectedOutput))
+      {
+        System.Console.WriteLine("TEST: EX5: Repeating character XOR successful!");
+      }
+      else
+      {
+        System.Console.WriteLine("TEST: EX5: Repeating character XOR not successful, output: {0}", ex5Output);
+        return false;
+      }
+
+      var hammingDistance = Frequency.CalculateHammingDistance(hammingDistanceInput1, hammingDistanceInput2);
+
+      if(hammingDistance == hammingDistanceCheck)
+      {
+        System.Console.WriteLine("TEST: EX6.1: Hamming distance check completed.");
+      }
+      else
+      {
+        System.Console.WriteLine("TEST: EX6.1: Hamming distance check failed. Output: {0}");
         return false;
       }
 

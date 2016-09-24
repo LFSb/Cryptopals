@@ -7,9 +7,9 @@ namespace ConsoleApplication.Helpers
 {
   public static class XOR
   {
-    private const String OutputFormat = "{0:x}";
+    private const String OutputFormat = "{0:x2}";
 
-    public static String XOREqualLengthInputs(String input1, String input2, bool outputIsHex = true)
+    public static String XOREqualLengthInputs(byte[] input1, byte[] input2, bool outputIsHex = true)
     {
       if(input1.Length != input2.Length)
       {
@@ -17,17 +17,37 @@ namespace ConsoleApplication.Helpers
       }    
 
       return DoXOR(
-          Convert.FromBase64String(Converter.ConvertHexToBase64(input1)),
-          Convert.FromBase64String(Converter.ConvertHexToBase64(input2)),
+          input1,
+          input2,
           outputIsHex
       );
     }
 
-    public static String XORInputToByte(String input, byte key, bool outputIsHex = true)
+    public static String XORInputToByte(byte[] input, byte key, bool outputIsHex = true)
     {
-      var inputBytes = Convert.FromBase64String(Converter.ConvertHexToBase64(input));
+      return DoXOR(input, input.Select(inputByte => key).ToArray(),outputIsHex);
+    }
 
-      return DoXOR(inputBytes, inputBytes.Select(inputByte => key).ToArray(),outputIsHex);
+    public static String RepeatingKeyXOREncryption(string input, string key, bool outputIsHex = true)
+    {
+      var inputBytes = Encoding.ASCII.GetBytes(input);
+
+      var sb = new StringBuilder();
+      var constructedKey = string.Empty;
+
+      for(var idx = 0; idx <= input.Length / key.Length; idx++)
+      {
+        sb.Append(key);
+      }
+
+      constructedKey = sb.ToString();
+
+      if(input.Length != constructedKey.Length)
+      {
+        constructedKey = constructedKey.Substring(0, input.Length);
+      }
+
+      return DoXOR(inputBytes, Encoding.ASCII.GetBytes(constructedKey.ToString()), outputIsHex);
     }
 
     private static String DoXOR(byte[] input1, byte[] input2, bool outputIsHex)
