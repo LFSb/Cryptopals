@@ -35,7 +35,7 @@ namespace ConsoleApplication.Helpers
       return score;
     }
 
-    public static Int32 CalculateHammingDistance(string input1, string input2)
+    public static Int32 CalculateHammingDistance(byte[] input1, byte[] input2)
     {
       var score = 0;
 
@@ -46,7 +46,7 @@ namespace ConsoleApplication.Helpers
 
       for(var idx = 0; idx < input1.Length; idx++)
       {
-        var val = Encoding.ASCII.GetBytes(input1[idx].ToString()).First() ^ Encoding.ASCII.GetBytes(input2[idx].ToString()).First();
+        var val = input1[idx] ^ input2[idx];
 
         while(val != 0)
         {

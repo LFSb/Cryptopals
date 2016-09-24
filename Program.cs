@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Diagnostics;
+using System.Text;
 using System.Collections.Generic;
 using ConsoleApplication.Helpers;
 
@@ -65,10 +65,9 @@ namespace ConsoleApplication
       if(Initialize())
       {
         //This is the real challenging part.
-        for(var keySize = 2; keySize <= 40; keySize++)
+        for(byte keySize = 2; keySize <= 40; keySize++)
         {
-          
-
+          //var hammingDistance = Frequency.CalculateHammingDistance()
         }
         
       }
@@ -181,7 +180,7 @@ namespace ConsoleApplication
         return false;
       }
 
-      var hammingDistance = Frequency.CalculateHammingDistance(hammingDistanceInput1, hammingDistanceInput2);
+      var hammingDistance = Frequency.CalculateHammingDistance(Encoding.ASCII.GetBytes(hammingDistanceInput1), Encoding.ASCII.GetBytes(hammingDistanceInput2));
 
       if(hammingDistance == hammingDistanceCheck)
       {
