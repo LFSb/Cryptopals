@@ -32,67 +32,57 @@ namespace ConsoleApplication
 
     public static void Main(string[] args)
     {
-      if(String.Equals(HexToConvert, HexConvertTarget))
+      if(Initialize())
       {
-        System.Console.WriteLine("Converting hex to base64 successful!");
+        var keyScores = new Dictionary<byte, int>();
+
+        var keyOutput = new Dictionary<byte, string>();
+
+        for(var idx = byte.MinValue; idx < byte.MaxValue; idx++)
+        {
+          var xorOutput = XOR.XORInputToByte(xord, idx, false);
+
+          keyOutput.Add(idx, xorOutput);
+
+          keyScores.Add(idx, Frequency.ScoreFrequencies(xorOutput));
+        }
+
+        var topScores = keyScores.OrderByDescending(x => x.Value).Take(1);
+
+        System.Console.WriteLine("Top 1 scores:\n{0}", String.Join(Environment.NewLine, topScores));
+
+        foreach(var key in topScores.Select(x => x.Key))
+        {
+          System.Console.WriteLine("{0} output: {1}", key, keyOutput[key]);
+        }
+      }
+    }
+
+    public static bool Initialize()
+    {
+      if(String.Equals(Converter.ConvertHexToBase64(HexToConvert), HexConvertTarget))
+      {
+        System.Console.WriteLine("TEST: Converting hex to base64 successful!");
       }
       else
       {
-        System.Console.WriteLine("Converting hex to base64 failed! Exiting...");
-        return;
+        System.Console.WriteLine("TEST: Converting hex to base64 failed! Exiting...");
+        return false;
       }
 
       var output = XOR.XOREqualLengthInputs(Xor1, Xor2);
 
       if(String.Equals(output, ExpectedXor))
       {
-        System.Console.WriteLine("XOR Successful!");
+        System.Console.WriteLine("TEST: XOR Successful!");
       }
       else
       {
-        System.Console.WriteLine("XOR failed! Output: {0}", output);
+        System.Console.WriteLine("TEST: XOR failed! Output: {0}", output);
+        return false;
       }
 
-      var keyFrequencies = new Dictionary<char, Dictionary<char,int>>();
-
-      for(var idx = char.MinValue; idx < char.MaxValue; idx++)
-      {
-        var frequency = new Dictionary<char,int>{
-                {'e',0},
-                {'t',0},
-                {'a',0},
-                {'o',0},
-                {'i',0},
-                {'n',0},
-                {'s',0},
-                {'h',0},
-                {'r',0},
-                {'d',0},
-                {'l',0},
-                {'u',0}
-              };
-
-        if(char.IsLetterOrDigit(idx) && idx.IsHex())
-        {
-          System.Console.WriteLine("XOR'ing using key {0}", idx);
-
-          var xorOutput = XOR.XOREqualLengthInputs(xord,new String(idx , xord.Length));
-
-          foreach(var character in xorOutput)
-          {
-            if(frequency.ContainsKey(character))
-            {
-              frequency[character]++;
-            }
-          }
-
-          keyFrequencies.Add(idx, frequency);
-
-          System.Console.WriteLine(xorOutput);
-
-          System.Console.WriteLine("Frequency was: {0}", String.Join(",", frequency.Select(x => x)));
-        }     
-      }
+      return true;
     }
   }
 }
