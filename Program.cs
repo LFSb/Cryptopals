@@ -69,14 +69,21 @@ namespace ConsoleApplication
 
         var hammingDistances = new Dictionary<int, int>();
        
-        //First, Find the probable size of the key.
+        //First, Find the most probable size of the key.
         for(byte keySize = 2; keySize <= 40; keySize++)
         {
-          var first = text.Take(keySize).ToArray();
+          var keySizeDistances = new List<int>(); 
 
-          var second = text.Skip(keySize).Take(keySize).ToArray();
+          for(var idx = 0; idx < 26; idx += 2)
+          {
+            var first = text.Skip(idx * keySize).Take(keySize).ToArray();
 
-          hammingDistances.Add(keySize, Frequency.CalculateHammingDistance(first, second) / keySize);
+            var second = text.Skip((idx + 1) * keySize).Take(keySize).ToArray(); 
+
+            keySizeDistances.Add(Frequency.CalculateHammingDistance(first, second));
+          }
+
+          hammingDistances.Add(keySize, keySizeDistances.Sum() / keySize);
         }
 
         //The most probable key size has the smallest hamming distance between the first two keysize sized blocks of bytes.
