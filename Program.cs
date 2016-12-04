@@ -64,13 +64,71 @@ namespace ConsoleApplication
     {
       if(Initialize())
       {
+        //This is the real challenging part.
         var text = Convert.FromBase64String(File.ReadAllText("TestFiles/6.txt"));
 
-        //This is the real challenging part.
+        var hammingDistances = new Dictionary<int, int>();
+       
+        //First, Find the probable size of the key.
         for(byte keySize = 2; keySize <= 40; keySize++)
         {
-          
-        }        
+          var first = text.Take(keySize).ToArray();
+
+          var second = text.Skip(keySize).Take(keySize).ToArray();
+
+          hammingDistances.Add(keySize, Frequency.CalculateHammingDistance(first, second) / keySize);
+        }
+
+        //The most probable key size has the smallest hamming distance between the first two keysize sized blocks of bytes.
+        var probableKeySize = hammingDistances.OrderBy(x => x.Value).First().Key;
+
+        //Create blocks of bytes.
+        var blockAmount = text.Length / probableKeySize;
+
+        var byteBlocks = new byte[blockAmount][];
+
+        for(var blockNumber = 0; blockNumber < blockAmount; blockNumber++)
+        {
+          byteBlocks[blockNumber] = text.Skip(blockNumber * probableKeySize).Take(probableKeySize).ToArray();
+        }
+
+        //Next, transpose the previously made blocks. 
+        //Make 5 "blocks", each containing all of the 1st, 2nd, 3rd, 4th and 5th byte of each of the previously made blocks.
+        var transposedBlocks = new byte[probableKeySize][];
+
+        for(var position = 0; position < probableKeySize; position++)
+        {
+          transposedBlocks[position] = byteBlocks.Select(block => block[position]).ToArray();
+        }
+
+        //Next, solve each block using single byte XOR.
+
+        var probableKey = new byte[probableKeySize];
+
+        for(var blockNumber = 0; blockNumber < transposedBlocks.Length; blockNumber++)
+        {
+          var keyScores = new Dictionary<byte, int>();
+
+          var keyOutput = new Dictionary<byte, string>();
+
+          for(var idx = byte.MinValue; idx < byte.MaxValue; idx++)
+          {
+            var output = XOR.XORInputToByte(transposedBlocks[blockNumber], idx);
+
+            keyOutput.Add(idx, output);
+
+            keyScores.Add(idx, Frequency.ScoreFrequencies(output));
+          }
+
+          var highestScore = keyScores.OrderByDescending(x => x.Value).First();
+
+          //The key for each block is said position's character for the actual key.
+          probableKey[blockNumber] = highestScore.Key;
+        }
+
+        var ex6Output = XOR.RepeatingKeyXOR(text, probableKey, false);
+
+        System.Console.WriteLine("Ex6: {0}",ex6Output);
       }
     }
 
@@ -107,7 +165,7 @@ namespace ConsoleApplication
 
       for(var idx = byte.MinValue; idx < byte.MaxValue; idx++)
       {
-        var xorOutput = XOR.XORInputToByte(Convert.FromBase64String(Converter.ConvertHexToBase64(xord)), idx, false);
+        var xorOutput = XOR.XORInputToByte(Convert.FromBase64String(Converter.ConvertHexToBase64(xord)), idx);
 
         keyOutput.Add(idx, xorOutput);
 
@@ -143,7 +201,7 @@ namespace ConsoleApplication
 
         for(var idx = byte.MinValue; idx < byte.MaxValue; idx++)
         {
-          var xorOutput = XOR.XORInputToByte(Convert.FromBase64String(Converter.ConvertHexToBase64(line)), idx, false);
+          var xorOutput = XOR.XORInputToByte(Convert.FromBase64String(Converter.ConvertHexToBase64(line)), idx);
 
           byteOutput.Add(idx, xorOutput);
 
@@ -169,11 +227,12 @@ namespace ConsoleApplication
         return false;
       }
 
-      var ex5Output = XOR.RepeatingKeyXOREncryption(ex5Input, ex5Key);
-
-      if(string.Equals(ex5Output, ex5ExpectedOutput))
+      var ex5Output = XOR.RepeatingKeyXOR(Encoding.ASCII.GetBytes(ex5Input), Encoding.ASCII.GetBytes(ex5Key));
+      var reversed = XOR.RepeatingKeyXOR(Convert.FromBase64String(Converter.ConvertHexToBase64(ex5Output)), Encoding.ASCII.GetBytes(ex5Key), false);
+      
+      if(string.Equals(ex5Output, ex5ExpectedOutput) && string.Equals(reversed, ex5Input))
       {
-        System.Console.WriteLine("TEST: EX5: Repeating character XOR successful!");
+        System.Console.WriteLine("TEST: EX5: Repeating character XOR successful! It even works both ways!");
       }
       else
       {

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
@@ -23,31 +24,26 @@ namespace ConsoleApplication.Helpers
       );
     }
 
-    public static String XORInputToByte(byte[] input, byte key, bool outputIsHex = true)
+    public static String XORInputToByte(byte[] input, byte key)
     {
-      return DoXOR(input, input.Select(inputByte => key).ToArray(),outputIsHex);
+      return DoXOR(input, input.Select(inputByte => key).ToArray(), false);
     }
 
-    public static String RepeatingKeyXOREncryption(string input, string key, bool outputIsHex = true)
+    public static String RepeatingKeyXOR(byte[] input, byte[] key, bool outputIsHex = true)
     {
-      var inputBytes = Encoding.ASCII.GetBytes(input);
+      var constructedKeyList = new List<byte>();
 
-      var sb = new StringBuilder();
-      var constructedKey = string.Empty;
-
-      for(var idx = 0; idx <= input.Length / key.Length; idx++)
+      while(constructedKeyList.Count < input.Length)
       {
-        sb.Append(key);
+        constructedKeyList.AddRange(key);
       }
 
-      constructedKey = sb.ToString();
-
-      if(input.Length != constructedKey.Length)
+      if(constructedKeyList.Count != input.Length)
       {
-        constructedKey = constructedKey.Substring(0, input.Length);
+        constructedKeyList = constructedKeyList.Take(input.Length).ToList();
       }
-
-      return DoXOR(inputBytes, Encoding.ASCII.GetBytes(constructedKey.ToString()), outputIsHex);
+      
+      return DoXOR(input, constructedKeyList.ToArray(), outputIsHex);
     }
 
     private static String DoXOR(byte[] input1, byte[] input2, bool outputIsHex)
