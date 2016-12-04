@@ -58,84 +58,16 @@ namespace ConsoleApplication
 
     private const Int32 hammingDistanceCheck = 37;
 
+    //Base 64 representation of the expected key.
+    private const string expectedKey = "VGVybWluYXRvciBYOiBCcmluZyB0aGUgbm9pc2U=";
+
     #endregion
 
     public static void Main(string[] args)
     {
       if(Initialize())
       {
-        //This is the real challenging part.
-        var text = Convert.FromBase64String(File.ReadAllText("TestFiles/6.txt"));
-
-        var hammingDistances = new Dictionary<int, int>();
-       
-        //First, Find the most probable size of the key.
-        for(byte keySize = 2; keySize <= 40; keySize++)
-        {
-          var keySizeDistances = new List<int>(); 
-
-          for(var idx = 0; idx < 26; idx += 2)
-          {
-            var first = text.Skip(idx * keySize).Take(keySize).ToArray();
-
-            var second = text.Skip((idx + 1) * keySize).Take(keySize).ToArray(); 
-
-            keySizeDistances.Add(Frequency.CalculateHammingDistance(first, second));
-          }
-
-          hammingDistances.Add(keySize, keySizeDistances.Sum() / keySize);
-        }
-
-        //The most probable key size has the smallest hamming distance between the first two keysize sized blocks of bytes.
-        var probableKeySize = hammingDistances.OrderBy(x => x.Value).First().Key;
-
-        //Create blocks of bytes.
-        var blockAmount = text.Length / probableKeySize;
-
-        var byteBlocks = new byte[blockAmount][];
-
-        for(var blockNumber = 0; blockNumber < blockAmount; blockNumber++)
-        {
-          byteBlocks[blockNumber] = text.Skip(blockNumber * probableKeySize).Take(probableKeySize).ToArray();
-        }
-
-        //Next, transpose the previously made blocks. 
-        //Make 5 "blocks", each containing all of the 1st, 2nd, 3rd, 4th and 5th byte of each of the previously made blocks.
-        var transposedBlocks = new byte[probableKeySize][];
-
-        for(var position = 0; position < probableKeySize; position++)
-        {
-          transposedBlocks[position] = byteBlocks.Select(block => block[position]).ToArray();
-        }
-
-        //Next, solve each block using single byte XOR.
-
-        var probableKey = new byte[probableKeySize];
-
-        for(var blockNumber = 0; blockNumber < transposedBlocks.Length; blockNumber++)
-        {
-          var keyScores = new Dictionary<byte, int>();
-
-          var keyOutput = new Dictionary<byte, string>();
-
-          for(var idx = byte.MinValue; idx < byte.MaxValue; idx++)
-          {
-            var output = XOR.XORInputToByte(transposedBlocks[blockNumber], idx);
-
-            keyOutput.Add(idx, output);
-
-            keyScores.Add(idx, Frequency.ScoreFrequencies(output));
-          }
-
-          var highestScore = keyScores.OrderByDescending(x => x.Value).First();
-
-          //The key for each block is said position's character for the actual key.
-          probableKey[blockNumber] = highestScore.Key;
-        }
-
-        var ex6Output = XOR.RepeatingKeyXOR(text, probableKey, false);
-
-        System.Console.WriteLine("Ex6: {0}",ex6Output);
+        
       }
     }
 
@@ -259,7 +191,87 @@ namespace ConsoleApplication
         return false;
       }
 
-      return true;
+      var text = Convert.FromBase64String(File.ReadAllText("TestFiles/6.txt"));
+
+        var hammingDistances = new Dictionary<int, int>();
+       
+        //First, Find the most probable size of the key.
+        for(byte keySize = 2; keySize <= 40; keySize++)
+        {
+          var keySizeDistances = new List<int>(); 
+
+          for(var idx = 0; idx < 26; idx += 2)
+          {
+            var first = text.Skip(idx * keySize).Take(keySize).ToArray();
+
+            var second = text.Skip((idx + 1) * keySize).Take(keySize).ToArray(); 
+
+            keySizeDistances.Add(Frequency.CalculateHammingDistance(first, second));
+          }
+
+          hammingDistances.Add(keySize, keySizeDistances.Sum() / keySize);
+        }
+
+        //The most probable key size has the smallest hamming distance between the first two keysize sized blocks of bytes.
+        var probableKeySize = hammingDistances.OrderBy(x => x.Value).First().Key;
+
+        //Create blocks of bytes.
+        var blockAmount = text.Length / probableKeySize;
+
+        var byteBlocks = new byte[blockAmount][];
+
+        for(var blockNumber = 0; blockNumber < blockAmount; blockNumber++)
+        {
+          byteBlocks[blockNumber] = text.Skip(blockNumber * probableKeySize).Take(probableKeySize).ToArray();
+        }
+
+        //Next, transpose the previously made blocks. 
+        //Make 5 "blocks", each containing all of the 1st, 2nd, 3rd, 4th and 5th byte of each of the previously made blocks.
+        var transposedBlocks = new byte[probableKeySize][];
+
+        for(var position = 0; position < probableKeySize; position++)
+        {
+          transposedBlocks[position] = byteBlocks.Select(block => block[position]).ToArray();
+        }
+
+        //Next, solve each block using single byte XOR.
+
+        var probableKey = new byte[probableKeySize];
+
+        for(var blockNumber = 0; blockNumber < transposedBlocks.Length; blockNumber++)
+        {
+          var ex6KeyScores = new Dictionary<byte, int>();
+
+          var ex6KeyOutPut = new Dictionary<byte, string>();
+
+          for(var idx = byte.MinValue; idx < byte.MaxValue; idx++)
+          {
+            var xorOutput = XOR.XORInputToByte(transposedBlocks[blockNumber], idx);
+
+            ex6KeyOutPut.Add(idx, xorOutput);
+
+            ex6KeyScores.Add(idx, Frequency.ScoreFrequencies(xorOutput));
+          }
+
+          var highestScore = ex6KeyScores.OrderByDescending(x => x.Value).First();
+
+          //The key for each block is said position's character for the actual key.
+          probableKey[blockNumber] = highestScore.Key;
+        }
+
+        var ex6Output = XOR.RepeatingKeyXOR(text, probableKey, false);
+
+        if(string.Equals(System.Convert.ToBase64String(probableKey),System.Convert.ToBase64String(probableKey)))
+        {
+          System.Console.WriteLine("EX6: Breaking repeating key XOR solved!");
+        }
+        else
+        {
+          System.Console.WriteLine("Unable to solve EX6, something went wrong.");
+          return false;
+        }
+
+        return true;
     }
   }
 }
