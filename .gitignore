@@ -144,7 +144,8 @@ UpgradeLog*.htm
 *.txt~
 *.swp
 *.swo
- 
+project.lock.json
+
 # svn
 .svn
 
