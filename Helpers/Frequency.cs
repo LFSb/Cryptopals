@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace ConsoleApplication.Helpers
@@ -6,6 +7,25 @@ namespace ConsoleApplication.Helpers
   public static class Frequency
   {
     private const string etaoinshrdlu = "etaoinshrdlumwfgypbvkjxqz";
+
+    //Takes a byte array as an input, and proceeds to score the output of xor'ing said input on a random byte. The score, and the output of each byte will be returned.
+    public static Dictionary<byte, int> ScoreInput(byte[] input, out Dictionary<byte, string> byteOutput)
+    {
+      var byteScores = new Dictionary<byte, int>();
+
+      byteOutput = new Dictionary<byte, string>();
+
+      for(var idx = byte.MinValue; idx < byte.MaxValue; idx++)
+      {
+        var xorOutput = XOR.XORInputToByte(input, idx);
+
+        byteOutput.Add(idx, xorOutput);
+
+        byteScores.Add(idx, Frequency.ScoreFrequencies(xorOutput));
+      }
+
+      return byteScores; 
+    }
 
     //Score the input string based on the occurrance of the most frequently occurring letters in the english language.
     public static Int32 ScoreFrequencies(string input)

@@ -135,27 +135,16 @@ namespace ConsoleApplication
 
       //#4 https://cryptopals.com/sets/1/challenges/4
 
-      var lines = File.ReadLines("TestFiles/4.txt");
+      var lines = File.ReadLines("TestFiles/4.txt").ToArray();
 
       var lineScores = new Dictionary<int, KeyValuePair<int, string>>();
 
-      var lineNr = 0;
-
-      foreach(var line in lines)
+      for(var lineNr = 0; lineNr < lines.Count(); lineNr++)
       {
-        var byteScores = new Dictionary<byte, int>();
-
         var byteOutput = new Dictionary<byte, string>();
 
-        for(var idx = byte.MinValue; idx < byte.MaxValue; idx++)
-        {
-          var xorOutput = XOR.XORInputToByte(Convert.FromBase64String(Converter.ConvertHexToBase64(line)), idx);
-
-          byteOutput.Add(idx, xorOutput);
-
-          byteScores.Add(idx, Frequency.ScoreFrequencies(xorOutput));
-        }
-
+        var byteScores = Frequency.ScoreInput(Convert.FromBase64String(Converter.ConvertHexToBase64(lines[lineNr])), out byteOutput);
+        
         var highestScore = byteScores.OrderByDescending(x => x.Value).First();
 
         lineScores.Add(lineNr, new KeyValuePair<int, string>(highestScore.Value, byteOutput[highestScore.Key]));
@@ -174,6 +163,8 @@ namespace ConsoleApplication
         System.Console.WriteLine("TEST: EX4: Detect single character XOR not successful, output was: {0}", highestScoringLine.Value.Value);
         return false;
       }
+
+      //#5 https://cryptopals.com/sets/1/challenges/5
 
       var ex5Output = XOR.RepeatingKeyXOR(Encoding.ASCII.GetBytes(ex5Input), Encoding.ASCII.GetBytes(ex5Key));
       var reversed = XOR.RepeatingKeyXOR(Convert.FromBase64String(Converter.ConvertHexToBase64(ex5Output)), Encoding.ASCII.GetBytes(ex5Key), false);
@@ -199,6 +190,8 @@ namespace ConsoleApplication
         System.Console.WriteLine("TEST: EX6.1: Hamming distance check failed. Output: {0}", hammingDistance);
         return false;
       }
+
+      //#6 https://cryptopals.com/sets/1/challenges/6
 
       var ex6InputBytes = Convert.FromBase64String(File.ReadAllText("TestFiles/6.txt"));
       

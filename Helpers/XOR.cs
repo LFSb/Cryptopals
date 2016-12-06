@@ -75,7 +75,7 @@ namespace ConsoleApplication.Helpers
       return hammingDistances.OrderBy(x => x.Value).First().Key;
     }
 
-    public static byte[] ReturnRepeatingXORKey(byte[] input,int probableKeySize)
+    public static byte[] ReturnRepeatingXORKey(byte[] input, int probableKeySize)
     {
       //Create blocks of bytes.
       var blockAmount = input.Length / probableKeySize;
@@ -102,18 +102,9 @@ namespace ConsoleApplication.Helpers
 
       for(var blockNumber = 0; blockNumber < transposedBlocks.Length; blockNumber++)
       {
-        var ex6KeyScores = new Dictionary<byte, int>();
-
         var ex6KeyOutPut = new Dictionary<byte, string>();
-
-        for(var idx = byte.MinValue; idx < byte.MaxValue; idx++)
-        {
-          var xorOutput = XOR.XORInputToByte(transposedBlocks[blockNumber], idx);
-
-          ex6KeyOutPut.Add(idx, xorOutput);
-
-          ex6KeyScores.Add(idx, Frequency.ScoreFrequencies(xorOutput));
-        }
+        
+        var ex6KeyScores = Frequency.ScoreInput(transposedBlocks[blockNumber], out ex6KeyOutPut);      
 
         var highestScore = ex6KeyScores.OrderByDescending(x => x.Value).First();
 
