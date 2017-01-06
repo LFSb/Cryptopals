@@ -76,7 +76,7 @@ namespace ConsoleApplication
       {
         var input = Convert.FromBase64String(File.ReadAllText("TestFiles/7.txt"));
 
-        var output = Crypto.DecryptAES128ECB(input, Convert.FromBase64String(challenge7Key));
+        var output = Crypto.DecryptAES128ECB(input, Encoding.ASCII.GetBytes(challenge7Key), 16);
       }
     }
 

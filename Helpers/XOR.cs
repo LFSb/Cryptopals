@@ -135,5 +135,17 @@ namespace ConsoleApplication.Helpers
     
       return output.ToString();
     }
+
+    public static byte[] DoXOR(byte[] input1, byte[] input2)
+    {
+      var output = new byte[input1.Length];
+
+      for(var character = 0; character < input1.Length; character++)
+      {
+        output[character] = (byte)(input1[character] ^ input2[character]);
+      }
+
+      return output;
+    }
   }
 }
